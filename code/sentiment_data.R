@@ -62,7 +62,7 @@ my_data_test = my_data_test %>%
 # save data
 write_csv(my_data_test, "./data/congress.csv")
 
-write_csv(congress, "./data/congress.csv")
+
 
 
 # descriptive  data 
@@ -78,7 +78,7 @@ congress= congress %>%
 
 # which days are the busiest in terms of activity
 
-congress %>%
+my_data_test %>%
   group_by(document) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -95,13 +95,13 @@ congress %>%
 # how is the monthly activity
 
   
-congress %>%
+my_data_test  %>%
   group_by(document) %>%
-  filter(row_number() == 1) %>%
+  filter(row_number() == 1, month != "Dec") %>%
   ungroup() %>%
   group_by(month) %>%
   tally() %>%
-  mutate(Government = ifelse(month %in% c("Jun", "Jul", "Aug", "Sep", "Oct", "Nov"), "PSOE", "PP")) %>%
+  mutate(Government = ifelse(month %in% c("Jun", "Jul", "Sep", "Oct", "Nov"), "PSOE", "PP")) %>%
   ggplot(., aes(month, n, fill = Government)) + 
   geom_col(alpha = 0.75) + 
   scale_y_continuous(limits = c(0, 10), 
@@ -115,25 +115,21 @@ congress %>%
 
 # how long are the sessions (by number of pages in the pdf)
 
-congress %>%
+my_data_test %>%
   group_by(document) %>%
-  filter(row_number() == 1) %>%
+  filter(row_number() == 1, month != "Dec") %>%
   ungroup() %>%
   group_by(month) %>%
-  filter(month == "Aug")
-  summarise(mean_page = mean(total_pages)) %>%
-  mutate(Government = ifelse(month %in% c("Jun", "Jul", "Aug", "Sep", "Oct", "Nov"), "PSOE", "PP")) %>%
+  summarise(mean_page = mean(total_page)) %>%
+  mutate(Government = ifelse(month %in% c("Jun", "Jul", "Sep", "Oct", "Nov"), "PSOE", "PP")) %>%
   ggplot(., aes(month, mean_page, fill = Government)) + 
   geom_col(alpha = 0.75) + 
   scale_fill_manual(values = c("deepskyblue1", "firebrick2")) +
   theme_ipsum(grid = "Y") + 
-  labs(title = "# plenary meetings per month", x= "",  y = "") 
+  labs(title = "How long are the sessions?", x= "",  y = "Average number of pages in the session") 
 
   
   
-
-
-
 
 
 # clean information 
@@ -206,6 +202,7 @@ congress_clean %>%
 
 library(rvest)
 library(pdftools)
+library(lubridate)
 
 URL <- "http://www.congreso.es/portal/page/portal/Congreso/Congreso/Publicaciones/DiaSes/Pleno"
 
@@ -213,17 +210,6 @@ scraping_url <- read_html(URL)
 
 members = scraping_url %>%
   html_nodes("a") %>%
-  html_attr("href") %>%
-  as.data.frame()
-
-
-
-dates = scraping_url %>%
-  html_attr("<li>")  %>%
-  as.data.frame()
-
-
-%>%
   html_attr("href") %>%
   as.data.frame()
 
@@ -243,20 +229,23 @@ raw_text <- map(members_documents$url, pdf_text)
 
 my_data <- data_frame(document = members_documents$url, text = raw_text)  
 
-# get the dates 
-
-scraping_url %>%
-  html_nodes("a") %>%
-  html_attr("href") %>%
-  as.data.frame()
-
-
-
 
 my_data_test = my_data %>% 
   unnest %>% # pdfs_text is a list
   group_by(document) %>%
-  mutate(page = row_number())
+  mutate(page = row_number(), 
+         total_page = n(),
+         date = str_extract(text, "celebrada el (.*)"),
+          date2 = gsub("celebrada el | de", "", date)) %>% 
+    separate(date2, into = c("weekday", "day", "month", "year"), sep = " ") %>%
+     unite("date_clean", c(year, month, day), sep = "-")  %>%
+     mutate(date_clean = parse_date(date_clean,"%Y-%B-%d",locale=locale("es"))) %>%
+  fill(date_clean, .direction = "down") %>%
+  mutate(day_week = wday(date_clean, label = T), 
+         month = month(date_clean, label = T)) %>%
+  select(-date, -weekday)
+  
+
 
   
 
