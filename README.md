@@ -17,4 +17,7 @@ There is raw data corresponding to all plenary sessions of Spanish Parliament in
 
 This dataset has been used for the creating a blog entry [_"2018 in the Spanish Congress"_](https://edugonzalmo.netlify.com/post/congreso-espa%C3%B1ol/) (in Spanish)
 
+<img width="517" alt="Screenshot 2019-05-19 at 09 32 12" src="https://user-images.githubusercontent.com/15041004/57979743-f3871c80-7a19-11e9-8cbb-bc7427e8ad0f.png">
+
+
 These materials and work are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
