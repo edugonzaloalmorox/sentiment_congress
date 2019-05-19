@@ -15,4 +15,6 @@ There is raw data corresponding to all plenary sessions of Spanish Parliament in
 - `session_type`: Type of session. New session (`inicio`) or re-start of the session (`reanuda`) 
 
 
+This dataset has been used for the creating a blog entry [_"2018 in the Spanish Congress"_](https://edugonzalmo.netlify.com/post/congreso-espa%C3%B1ol/) (in Spanish)
+
 These materials and work are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
